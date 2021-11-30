@@ -26,9 +26,7 @@ def node_by_kv(var, key, value):
     if isinstance(var, dict):
         for k, v in var.items():
             if k == key and v == value:
-                print(var)
                 yield var
-                raise StopIteration
             if isinstance(v, (dict, list)):
                 yield from node_by_kv(v, key, value)
     elif isinstance(var, list):
@@ -38,6 +36,10 @@ def node_by_kv(var, key, value):
 
 def contact_dict(contact_xml: str):
     xml = xmltodict.parse(contact_xml)
+    print('called')
+    val = node_by_kv(
+        xml,  '@resource-id', 'com.instagram.android:id/contact_option_sub_text')
+    print(val)
     data = {
         "contact-method": from_xml(xml, "com.instagram.android:id/contact_option_header"),
         "contact": from_xml(xml, "com.instagram.android:id/contact_option_sub_text")
@@ -48,7 +50,7 @@ def contact_dict(contact_xml: str):
 def email_dict(email_xml: str):
     xml = xmltodict.parse(email_xml)
     data = {
-        "email": from_xml(xml, "com.google.android.gm:id/spinner_account_address")
+        "email": from_xml(xml, "com.google.android.gm:id/peoplekit_chip", '@resource-id', '@content-desc')
     }
     return data
 
@@ -64,8 +66,29 @@ def profile_dict(profile_xml: str):
     return data
 
 
-def from_xml(data,  resource_val, resource_id="@resource-id"):
+def from_xml(data,  resource_val, resource_id="@resource-id", key='@text'):
     data = node_by_kv(data, resource_id, resource_val)
-    val = data.__next__()
-    text = dict(val)['@text']
-    return text
+    val = None
+    try:
+        val = data.__next__()
+    except StopIteration:
+        print('iteration was stopped')
+    data.close()
+    if val is None:
+        return ""
+
+    return dict(val)[key]
+
+
+def from_xml_key(data,  resource_val, resource_id="@resource-id", key='@text'):
+    data = node_by_kv(data, resource_id, resource_val)
+    val = None
+    try:
+        val = data.__next__()
+    except StopIteration:
+        print('iteration was stopped')
+    data.close()
+    if val is None:
+        return ""
+
+    return dict(val)[key]

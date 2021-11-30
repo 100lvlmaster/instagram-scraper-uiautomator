@@ -1,7 +1,8 @@
 from uiautomator import device as d
-from navigate import click_explore, navigate_to_profile, open_followings, open_ig_from_home
+from navigate import navigate_to_profile,  open_ig_from_home
 from xmltocsv import email_dict, contact_dict, profile_dict
-brand: str = "urshaynesss"
+from os.path import exists
+import csv
 
 
 # Profile
@@ -30,6 +31,7 @@ def dump_email_if_exists():
         d(
             text="Email", resourceId="com.instagram.android:id/button_text").click()
         d.wait.idle()
+        d.wait.idle()
         email_xml = d.dump()
         d.press.back()
         d.press.back()
@@ -42,6 +44,7 @@ def dump_contact_if_exists():
     if(has_contact):
         d(text="Contact").click()
         d.wait.update()
+        d.wait.idle()
         contact_xml = d.dump()
         data = contact_dict(contact_xml)
         d.press.back()
@@ -49,8 +52,10 @@ def dump_contact_if_exists():
 
 
 def dump_profile():
+    d.wait.idle()
     profile_xml = d.dump()
     data = profile_dict(profile_xml)
+
     return data
 
 
@@ -60,9 +65,9 @@ def init_dump():
     contact = dump_contact_if_exists()
     data = profile
     if(contact is not None):
-        data = profile | contact
+        data = {**profile, **contact}
     if(email is not None):
-        data = data | email
+        data = {**data, **email}
     return data
 
 
@@ -85,21 +90,45 @@ def browse_profiles():
             scroll_to_top()
 
 
+def init_users_csv():
+    export_file = 'users.csv'
+    file_exists = exists(export_file)
+    if not file_exists:
+        file = open(export_file, '+a')
+        csv_writer = csv.writer(file)
+        header = ['bio', 'category', 'name', 'username',
+                  'contact', 'contact-method', 'email']
+        csv_writer.writerow(header)
+        file.close()
+    # Create file with header
+
+
+def dump_csv(user_dict: dict):
+    file = open('users.csv', 'a+')
+    csv_writer = csv.writer(file)
+    csv_writer.writerow(user_dict.values())
+    file.close()
+
+
 def main():
-    usernames = ''
-    with open('usernames.txt', 'r') as text:
-        usernames = "".join(text.readlines()).split('\n')
-        text.close()
-    d.press.home()
-    open_ig_from_home()
-    for val in usernames:
-        navigate_to_profile(val)
-        data = init_dump()
-        print(data)
+    # init_users_csv()
+    # #
+    # file = open('usernames.txt', 'r')
+    # usernames = "".join(file.readlines()).split('\n')
+    # file.close()
+    #
+    # d.press.home()
+    # open_ig_from_home()
+    data = contact_dict(d.dump())
+    print(data)
+    # for val in usernames:
+    #     navigate_to_profile(val)
+    #     data = init_dump()
+    #     dump_csv(data)
     d.wait.update()
     # open_followings()
     # browse_profiles()
-    click_explore()
+    # click_explore()
 
 
 main()

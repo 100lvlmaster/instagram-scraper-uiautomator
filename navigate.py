@@ -8,6 +8,7 @@ def navigate_to_profile(name: str):
     d(text='Search').click()
     d(className="android.widget.EditText").set_text(name)
     d(text=name).click()
+    d.wait.update()
 
 
 def click_explore():
