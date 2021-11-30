@@ -1,8 +1,6 @@
-import time
 from uiautomator import device as d
-from dump_xml import dump_email, dump_profile_xml, dump_contact, dumpXml, createDir
 from navigate import click_explore, navigate_to_profile, open_followings, open_ig_from_home
-import os
+from xmltocsv import email_dict, contact_dict, profile_dict
 brand: str = "urshaynesss"
 
 
@@ -22,35 +20,50 @@ brand: str = "urshaynesss"
 # Email
 # com.google.android.gm:id/spinner_account_address
 
-def dump_email_if_exists(path: str):
+
+# Navigate to email page
+# and return email dict
+def dump_email_if_exists():
     hasEmail = d(
         text="Email", resourceId="com.instagram.android:id/button_text").exists
     if(hasEmail):
         d(
             text="Email", resourceId="com.instagram.android:id/button_text").click()
-        dump_email(d.dump(), path)
+        d.wait.idle()
+        email_xml = d.dump()
         d.press.back()
         d.press.back()
+        data = email_dict(email_xml)
+        return data
 
 
-def dump_contact_if_exists(path: str):
+def dump_contact_if_exists():
     has_contact = d(text='Contact').exists
     if(has_contact):
         d(text="Contact").click()
         d.wait.update()
-        contact_dump = d.dump()
-        dump_contact(contact_dump, path)
+        contact_xml = d.dump()
+        data = contact_dict(contact_xml)
         d.press.back()
+        return data
 
 
-def dump_data():
-    path = createDir()
-    profile_dump = d.dump()
-    dump_profile_xml(profile_dump, path)
-    # Dump gmail
-    dump_email_if_exists(path)
-    # Dump contact
-    dump_contact_if_exists(path)
+def dump_profile():
+    profile_xml = d.dump()
+    data = profile_dict(profile_xml)
+    return data
+
+
+def init_dump():
+    profile = dump_profile()
+    email = dump_email_if_exists()
+    contact = dump_contact_if_exists()
+    data = profile
+    if(contact is not None):
+        data = profile | contact
+    if(email is not None):
+        data = data | email
+    return data
 
 
 def scroll_to_top():
@@ -66,14 +79,13 @@ def browse_profiles():
     count = len(follow_list)
     for index in range(count):
         follow_list[index].click()
-        dump_data()
+        init_dump()
         d.press.back()
         if(index == (count-1)):
             scroll_to_top()
 
 
 def main():
-    dumpXml(d.dump('dump.xml'))
     usernames = ''
     with open('usernames.txt', 'r') as text:
         usernames = "".join(text.readlines()).split('\n')
@@ -81,14 +93,12 @@ def main():
     d.press.home()
     open_ig_from_home()
     for val in usernames:
-        path = createDir()
         navigate_to_profile(val)
-        dump_contact_if_exists(path)
-        dump_email_if_exists(path)
-        dump_profile_xml(d.dump(), path)
+        data = init_dump()
+        print(data)
     d.wait.update()
-    open_followings()
-    browse_profiles()
+    # open_followings()
+    # browse_profiles()
     click_explore()
 
 
