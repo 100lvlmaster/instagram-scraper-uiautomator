@@ -1,4 +1,3 @@
-
 from uiautomator import device as d
 
 
@@ -26,6 +25,7 @@ def open_ig_from_home():
 
 def open_followings():
     d(textContains="Following").click()
+
 
 def scroll_to_top():
     device_info = d.info

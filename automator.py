@@ -48,7 +48,11 @@ def dump_profile():
 
 def init_dump():
     email = dump_email_if_exists()
-    contact = dump_contact_if_exists()
+    contact = {"email": "", "contact": ""}
+    try:
+        contact = dump_contact_if_exists()
+    except:
+        print('could not fetch contact')
     contact_data = {**email, **contact}
     if not contact_data['email'] and not contact_data['contact']:
         return contact_data
@@ -97,7 +101,7 @@ def main():
     #
     d.press.home()
     open_ig_from_home()
-    offset = 543
+    offset = 2053
     for idx, val in enumerate(usernames):
         print(idx)
         if not val:
