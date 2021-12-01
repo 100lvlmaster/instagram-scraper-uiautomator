@@ -1,5 +1,5 @@
 from uiautomator import device as d
-from navigate import navigate_to_profile,  open_ig_from_home
+from navigate import click_explore, navigate_to_profile, open_followings,  open_ig_from_home
 from xmltocsv import email_dict, contact_dict, profile_dict
 from os.path import exists
 import csv
@@ -53,9 +53,9 @@ def dump_contact_if_exists():
 
 def dump_profile():
     d.wait.idle()
+    d.wait.idle()
     profile_xml = d.dump()
     data = profile_dict(profile_xml)
-
     return data
 
 
@@ -64,10 +64,10 @@ def init_dump():
     email = dump_email_if_exists()
     contact = dump_contact_if_exists()
     data = profile
-    if(contact is not None):
-        data = {**profile, **contact}
     if(email is not None):
         data = {**data, **email}
+    if(contact is not None):
+        data = {**profile, **contact}
     return data
 
 
@@ -97,7 +97,7 @@ def init_users_csv():
         file = open(export_file, '+a')
         csv_writer = csv.writer(file)
         header = ['bio', 'category', 'name', 'username',
-                  'contact', 'contact-method', 'email']
+                  'contact', 'email', 'contact']
         csv_writer.writerow(header)
         file.close()
     # Create file with header
@@ -111,21 +111,25 @@ def dump_csv(user_dict: dict):
 
 
 def main():
-    # init_users_csv()
-    # #
-    # file = open('usernames.txt', 'r')
-    # usernames = "".join(file.readlines()).split('\n')
-    # file.close()
+    init_users_csv()
     #
-    # d.press.home()
-    # open_ig_from_home()
-    data = contact_dict(d.dump())
-    print(data)
-    # for val in usernames:
-    #     navigate_to_profile(val)
-    #     data = init_dump()
-    #     dump_csv(data)
-    d.wait.update()
+    file = open('usernames2.txt', 'r')
+    usernames = "".join(file.readlines()).split('\n')
+    file.close()
+    #
+    d.press.home()
+    open_ig_from_home()
+    offset = 900
+    for idx, val in enumerate(usernames):
+        if idx < offset:
+            continue
+        try:
+            navigate_to_profile(val)
+        except:
+            continue
+        data = init_dump()
+        dump_csv(data)
+        d.wait.update()
     # open_followings()
     # browse_profiles()
     # click_explore()

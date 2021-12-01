@@ -36,13 +36,10 @@ def node_by_kv(var, key, value):
 
 def contact_dict(contact_xml: str):
     xml = xmltodict.parse(contact_xml)
-    print('called')
-    val = node_by_kv(
-        xml,  '@resource-id', 'com.instagram.android:id/contact_option_sub_text')
-    print(val)
+    val = contact_from_xml(xml, "com.instagram.android:id/contact_options_rv")
     data = {
-        "contact-method": from_xml(xml, "com.instagram.android:id/contact_option_header"),
-        "contact": from_xml(xml, "com.instagram.android:id/contact_option_sub_text")
+        'email': from_xml(val['node'][0], 'com.instagram.android:id/contact_option_sub_text'),
+        'contact': from_xml(val['node'][1], 'com.instagram.android:id/contact_option_sub_text')
     }
     return data
 
@@ -72,23 +69,23 @@ def from_xml(data,  resource_val, resource_id="@resource-id", key='@text'):
     try:
         val = data.__next__()
     except StopIteration:
-        print('iteration was stopped')
+        print('Iteration was stopped')
     data.close()
     if val is None:
         return ""
-
+    if key == "none":
+        return dict(val)
     return dict(val)[key]
 
 
-def from_xml_key(data,  resource_val, resource_id="@resource-id", key='@text'):
+def contact_from_xml(data,  resource_val, resource_id="@resource-id"):
     data = node_by_kv(data, resource_id, resource_val)
     val = None
     try:
         val = data.__next__()
     except StopIteration:
-        print('iteration was stopped')
+        print('Iteration was stopped')
     data.close()
     if val is None:
         return ""
-
-    return dict(val)[key]
+    return dict(val)
