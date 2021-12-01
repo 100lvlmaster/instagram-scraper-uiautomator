@@ -7,8 +7,12 @@ def navigate_to_profile(name: str):
     click_explore()
     d(text='Search').click()
     d(className="android.widget.EditText").set_text(name)
-    d(text=name).click()
+    profile = d(text=name)
+    if not profile.exists:
+        return False
+    profile.click()
     d.wait.update()
+    return True
 
 
 def click_explore():
@@ -22,3 +26,10 @@ def open_ig_from_home():
 
 def open_followings():
     d(textContains="Following").click()
+
+def scroll_to_top():
+    device_info = d.info
+    height = device_info['displayHeight']
+    width = device_info['displayWidth']
+    # From sx,sy to ex,ey
+    d.swipe(width*0.5, height*0.9, width*0.5, height*0.15)

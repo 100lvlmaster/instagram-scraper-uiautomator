@@ -1,29 +1,13 @@
 from uiautomator import device as d
-from navigate import click_explore, navigate_to_profile, open_followings,  open_ig_from_home
+from navigate import navigate_to_profile, open_ig_from_home, scroll_to_top
 from xmltocsv import email_dict, contact_dict, profile_dict
 from os.path import exists
 import csv
 
-
-# Profile
-# com.instagram.android:id/profile_header_bio_text
-# com.instagram.android:id/profile_header_business_category
-# com.instagram.android:id/profile_header_full_name
-# com.instagram.android:id/action_bar_title
-# com.instagram.android:id/contact_option_sub_text
-# com.instagram.android:id/contact_option_header
-
-# Contact
-# com.instagram.android:id/contact_option_header
-# com.instagram.android:id/contact_option_sub_text
-
-
-# Email
-# com.google.android.gm:id/spinner_account_address
-
-
 # Navigate to email page
 # and return email dict
+
+
 def dump_email_if_exists():
     hasEmail = d(
         text="Email", resourceId="com.instagram.android:id/button_text").exists
@@ -37,6 +21,8 @@ def dump_email_if_exists():
         d.press.back()
         data = email_dict(email_xml)
         return data
+    # return empty dict
+    return {'email': ''}
 
 
 def dump_contact_if_exists():
@@ -49,6 +35,7 @@ def dump_contact_if_exists():
         data = contact_dict(contact_xml)
         d.press.back()
         return data
+    return {'contact': '', 'email': ''}
 
 
 def dump_profile():
@@ -60,23 +47,14 @@ def dump_profile():
 
 
 def init_dump():
-    profile = dump_profile()
     email = dump_email_if_exists()
     contact = dump_contact_if_exists()
-    data = profile
-    if(email is not None):
-        data = {**data, **email}
-    if(contact is not None):
-        data = {**profile, **contact}
+    contact_data = {**email, **contact}
+    if not contact_data['email'] and not contact_data['contact']:
+        return contact_data
+    profile = dump_profile()
+    data = {**profile, **contact_data}
     return data
-
-
-def scroll_to_top():
-    device_info = d.info
-    height = device_info['displayHeight']
-    width = device_info['displayWidth']
-    # From sx,sy to ex,ey
-    d.swipe(width*0.5, height*0.9, width*0.5, height*0.15)
 
 
 def browse_profiles():
@@ -119,16 +97,23 @@ def main():
     #
     d.press.home()
     open_ig_from_home()
-    offset = 900
+    offset = 543
     for idx, val in enumerate(usernames):
+        print(idx)
+        if not val:
+            continue
         if idx < offset:
             continue
+        profile_exists = False
         try:
-            navigate_to_profile(val)
+            profile_exists = navigate_to_profile(val)
         except:
             continue
+        if not profile_exists:
+            continue
         data = init_dump()
-        dump_csv(data)
+        if data['contact'] or data['email']:
+            dump_csv(data)
         d.wait.update()
     # open_followings()
     # browse_profiles()
