@@ -106,6 +106,7 @@ def main():
     d.press.home()
     open_ig_from_home()
     for idx, val in enumerate(usernames):
+        print(idx)
         if not val:
             continue
         if idx < offset:
