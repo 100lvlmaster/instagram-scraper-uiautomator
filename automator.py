@@ -92,6 +92,10 @@ def dump_csv(user_dict: dict):
     file.close()
 
 
+offset = 3500
+limit = 500
+
+
 def main():
     init_users_csv()
     #
@@ -101,13 +105,14 @@ def main():
     #
     d.press.home()
     open_ig_from_home()
-    offset = 2053
     for idx, val in enumerate(usernames):
-        print(idx)
         if not val:
             continue
         if idx < offset:
             continue
+        if idx > (offset+limit):
+            print('Scrape completed')
+            break
         profile_exists = False
         try:
             profile_exists = navigate_to_profile(val)
