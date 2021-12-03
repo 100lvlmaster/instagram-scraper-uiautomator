@@ -2,3 +2,5 @@ usernames.txt
 usernames2.txt
 users.csv
 __pycache__
+*.csv
+*.txt

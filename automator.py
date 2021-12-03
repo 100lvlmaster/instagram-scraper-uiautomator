@@ -92,14 +92,14 @@ def dump_csv(user_dict: dict):
     file.close()
 
 
-offset = 3500
-limit = 500
+offset = 0
+limit = 420
 
 
 def main():
     init_users_csv()
     #
-    file = open('usernames2.txt', 'r')
+    file = open('users-v2.txt', 'r')
     usernames = "".join(file.readlines()).split('\n')
     file.close()
     #
