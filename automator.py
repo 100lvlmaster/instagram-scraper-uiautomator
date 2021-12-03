@@ -3,12 +3,18 @@ from navigate import navigate_to_profile, open_ig_from_home, scroll_to_top
 from xmltocsv import email_dict, contact_dict, profile_dict
 from os.path import exists
 import csv
-
+import sys
 # Navigate to email page
 # and return email dict
 
 
+export_file = sys.argv[1]+".csv"
+import_file = sys.argv[1]
+
+
 def dump_email_if_exists():
+    d.wait.idle()
+    d.wait.update()
     hasEmail = d(
         text="Email", resourceId="com.instagram.android:id/button_text").exists
     if(hasEmail):
@@ -48,16 +54,12 @@ def dump_profile():
 
 def init_dump():
     email = dump_email_if_exists()
-    contact = {"email": "", "contact": ""}
-    try:
-        contact = dump_contact_if_exists()
-    except:
-        print('could not fetch contact')
-    contact_data = {**email, **contact}
-    if not contact_data['email'] and not contact_data['contact']:
-        return contact_data
+    contact = dump_contact_if_exists()
+    if not contact['contact'] and not email['email'] and not contact['email']:
+        return {}
+    contact.update(email)
     profile = dump_profile()
-    data = {**profile, **contact_data}
+    data = profile | contact
     return data
 
 
@@ -73,7 +75,6 @@ def browse_profiles():
 
 
 def init_users_csv():
-    export_file = 'users.csv'
     file_exists = exists(export_file)
     if not file_exists:
         file = open(export_file, '+a')
@@ -86,20 +87,20 @@ def init_users_csv():
 
 
 def dump_csv(user_dict: dict):
-    file = open('users.csv', 'a+')
+    file = open(export_file, 'a+')
     csv_writer = csv.writer(file)
     csv_writer.writerow(user_dict.values())
     file.close()
 
 
 offset = 0
-limit = 420
+limit = 1000
 
 
 def main():
     init_users_csv()
     #
-    file = open('users-v2.txt', 'r')
+    file = open(sys.argv[1], 'r')
     usernames = "".join(file.readlines()).split('\n')
     file.close()
     #
@@ -122,7 +123,7 @@ def main():
         if not profile_exists:
             continue
         data = init_dump()
-        if data['contact'] or data['email']:
+        if bool(data):
             dump_csv(data)
         d.wait.update()
     # open_followings()

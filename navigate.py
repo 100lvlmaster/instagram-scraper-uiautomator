@@ -1,5 +1,7 @@
 from uiautomator import device as d
 
+# This script will handle the functions that provide routing
+
 
 def navigate_to_profile(name: str):
     click_explore()

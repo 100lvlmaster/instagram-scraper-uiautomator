@@ -1,11 +1,12 @@
 import time
 import os
 
+# Handle file handling to dump xml
+
 
 def createDir():
     directory = f'{time.time_ns()}'
     path = os.path.join('dumps', directory)
-    print(path)
     try:
         print("Directory '%s' created successfully" % directory)
         os.makedirs(path, exist_ok=True)

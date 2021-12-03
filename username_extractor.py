@@ -1,8 +1,11 @@
+import sys
+
+# This script will extract usernames from
+# a given list of instagram profile urls
 
 
 def main():
-
-    file = open('fashion-influencers.csv', 'r')
+    file = open(sys.argv[1], 'r')
     data = file.readlines()
     file.close()
     ig_usernames = []
@@ -12,7 +15,7 @@ def main():
         lastSlash = username.rfind("/")+1
         firstQueryStart = username.find("?")
         ig_usernames.append(username[lastSlash: firstQueryStart])
-    file = open('influencers.txt', "+a")
+    file = open(sys.argv[1]+".txt", "+a")
     for names in ig_usernames:
         file.write(names+'\n')
     file.close
