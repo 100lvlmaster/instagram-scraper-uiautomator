@@ -78,7 +78,7 @@ def init_users_csv():
     if not file_exists:
         file = open(export_file, "+a")
         csv_writer = csv.writer(file)
-        header = ["bio", "category", "name", "username", "contact", "email", "contact"]
+        header = ["username", "followers_count"]
         csv_writer.writerow(header)
         file.close()
     # Create file with header
@@ -96,8 +96,6 @@ limit = 500
 
 
 def main():
-
-    return
     init_users_csv()
     file = open(sys.argv[1], "r")
     usernames = "".join(file.readlines()).split("\n")
@@ -121,8 +119,11 @@ def main():
             d.press.back()
             d.press.back()
             continue
-
-        data = init_dump()
+        followers_count = d(
+            resourceIdMatches="com.instagram.android:id/row_profile_header_textview_followers_count"
+        )
+        count = followers_count.info["text"]
+        data = {"username": val, "followers_count": count}
         if bool(data):
             dump_csv(data)
         d.wait.update()
