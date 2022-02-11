@@ -91,8 +91,8 @@ def dump_csv(user_dict: dict):
     file.close()
 
 
-offset = 501
-limit = 1000
+offset = 0
+limit = 500
 
 
 def main():
@@ -100,7 +100,6 @@ def main():
     file = open(sys.argv[1], "r")
     usernames = "".join(file.readlines()).split("\n")
     file.close()
-    #
     d.press.home()
     open_ig_from_home()
     for idx, val in enumerate(usernames):
