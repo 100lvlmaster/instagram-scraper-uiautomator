@@ -8,9 +8,16 @@ def navigate_to_profile(name: str):
     click_explore()
     d(text="Search").click()
     d(className="android.widget.EditText").set_text(name)
-    profile = d(text=name)
+    profile = d(
+        text=name, resourceIdMatches="com.instagram.android:id/row_search_user_username"
+    )
     if not profile.exists:
-        return False
+        profile = d(
+            resourceIdMatches="com.instagram.android:id/row_search_user_username"
+        )
+        d.wait.update()
+        if not profile.exists:
+            return False
     profile.click()
     d.wait.update()
     return True

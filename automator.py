@@ -91,13 +91,12 @@ def dump_csv(user_dict: dict):
     file.close()
 
 
-offset = 500
+offset = 501
 limit = 1000
 
 
 def main():
     init_users_csv()
-    #
     file = open(sys.argv[1], "r")
     usernames = "".join(file.readlines()).split("\n")
     file.close()
