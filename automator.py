@@ -4,22 +4,21 @@ from xmltocsv import email_dict, contact_dict, profile_dict
 from os.path import exists
 import csv
 import sys
+
 # Navigate to email page
 # and return email dict
 
 
-export_file = sys.argv[1]+".csv"
+export_file = sys.argv[1] + ".csv"
 import_file = sys.argv[1]
 
 
 def dump_email_if_exists():
     d.wait.idle()
     d.wait.update()
-    hasEmail = d(
-        text="Email", resourceId="com.instagram.android:id/button_text").exists
-    if(hasEmail):
-        d(
-            text="Email", resourceId="com.instagram.android:id/button_text").click()
+    hasEmail = d(text="Email", resourceId="com.instagram.android:id/button_text").exists
+    if hasEmail:
+        d(text="Email", resourceId="com.instagram.android:id/button_text").click()
         d.wait.idle()
         d.wait.idle()
         email_xml = d.dump()
@@ -28,12 +27,12 @@ def dump_email_if_exists():
         data = email_dict(email_xml)
         return data
     # return empty dict
-    return {'email': ''}
+    return {"email": ""}
 
 
 def dump_contact_if_exists():
-    has_contact = d(text='Contact').exists
-    if(has_contact):
+    has_contact = d(text="Contact").exists
+    if has_contact:
         d(text="Contact").click()
         d.wait.update()
         d.wait.idle()
@@ -41,7 +40,7 @@ def dump_contact_if_exists():
         data = contact_dict(contact_xml)
         d.press.back()
         return data
-    return {'contact': '', 'email': ''}
+    return {"contact": "", "email": ""}
 
 
 def dump_profile():
@@ -55,7 +54,7 @@ def dump_profile():
 def init_dump():
     email = dump_email_if_exists()
     contact = dump_contact_if_exists()
-    if not contact['contact'] and not email['email'] and not contact['email']:
+    if not contact["contact"] and not email["email"] and not contact["email"]:
         return {}
     contact.update(email)
     profile = dump_profile()
@@ -64,44 +63,43 @@ def init_dump():
 
 
 def browse_profiles():
-    follow_list = d(resourceId='com.instagram.android:id/follow_list_username')
+    follow_list = d(resourceId="com.instagram.android:id/follow_list_username")
     count = len(follow_list)
     for index in range(count):
         follow_list[index].click()
         init_dump()
         d.press.back()
-        if(index == (count-1)):
+        if index == (count - 1):
             scroll_to_top()
 
 
 def init_users_csv():
     file_exists = exists(export_file)
     if not file_exists:
-        file = open(export_file, '+a')
+        file = open(export_file, "+a")
         csv_writer = csv.writer(file)
-        header = ['bio', 'category', 'name', 'username',
-                  'contact', 'email', 'contact']
+        header = ["bio", "category", "name", "username", "contact", "email", "contact"]
         csv_writer.writerow(header)
         file.close()
     # Create file with header
 
 
 def dump_csv(user_dict: dict):
-    file = open(export_file, 'a+')
+    file = open(export_file, "a+")
     csv_writer = csv.writer(file)
     csv_writer.writerow(user_dict.values())
     file.close()
 
 
-offset = 0
+offset = 500
 limit = 1000
 
 
 def main():
     init_users_csv()
     #
-    file = open(sys.argv[1], 'r')
-    usernames = "".join(file.readlines()).split('\n')
+    file = open(sys.argv[1], "r")
+    usernames = "".join(file.readlines()).split("\n")
     file.close()
     #
     d.press.home()
@@ -112,10 +110,9 @@ def main():
             continue
         if idx < offset:
             continue
-        if idx > (offset+limit):
-            print('Scrape completed')
+        if idx > (offset + limit):
+            print("Scrape completed")
             break
-        profile_exists = False
         try:
             profile_exists = navigate_to_profile(val)
         except:

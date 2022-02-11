@@ -6,7 +6,7 @@ from uiautomator import device as d
 def navigate_to_profile(name: str):
     click_explore()
     click_explore()
-    d(text='Search').click()
+    d(text="Search").click()
     d(className="android.widget.EditText").set_text(name)
     profile = d(text=name)
     if not profile.exists:
@@ -17,7 +17,7 @@ def navigate_to_profile(name: str):
 
 
 def click_explore():
-    d(description="Search and Explore").click()
+    d(description="Search and explore").click()
 
 
 def open_ig_from_home():
@@ -31,7 +31,7 @@ def open_followings():
 
 def scroll_to_top():
     device_info = d.info
-    height = device_info['displayHeight']
-    width = device_info['displayWidth']
+    height = device_info["displayHeight"]
+    width = device_info["displayWidth"]
     # From sx,sy to ex,ey
-    d.swipe(width*0.5, height*0.9, width*0.5, height*0.15)
+    d.swipe(width * 0.5, height * 0.9, width * 0.5, height * 0.15)
